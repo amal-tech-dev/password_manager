@@ -18,7 +18,7 @@ VAULT_FILE = DATA_DIR / "vault.enc"
 INGEST_TOKEN = os.getenv("DEV_VAULT_INGEST_TOKEN", "")
 DASHBOARD_TOKEN = os.getenv("DEV_VAULT_DASHBOARD_TOKEN", "")
 VAULT_KEY = os.getenv("DEV_VAULT_FERNET_KEY", "")
-HOST = os.getenv("DEV_VAULT_HOST", "0.0.0.0")
+HOST = os.getenv("DEV_VAULT_HOST", "192.168.1.113")
 PORT = int(os.getenv("DEV_VAULT_PORT", "8765"))
 ALLOWED_ORIGINS = [
     origin.strip()
