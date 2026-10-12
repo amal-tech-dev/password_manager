@@ -84,9 +84,14 @@ await passwordManager.save(
   username: username,
   password: password,
 );
+
+final storedPasswords = await passwordManager.getPasswords(
+  dashboardToken: 'YOUR_DASHBOARD_TOKEN',
+);
+// Map<String, Map<String, String>>: domain -> username -> password
 ```
 
-The `domain` argument is saved as the vault group key instead of an institution code. The package sends credentials only to the configured server; it does not persist them locally. `save` throws on validation, network, timeout, and non-success HTTP errors, so callers can catch failures without logging credentials. The timeout defaults to 10 seconds and can be configured with `requestTimeout`. A timeout usually means the device cannot reach the configured server address; check `/health`, the server bind address, and the firewall rather than only increasing the timeout. Close the manager when finished with it:
+The `domain` argument is saved as the vault group key instead of an institution code. `save` uses the ingest token to write logins; `getPasswords` uses the dashboard token to read the full vault and returns `Map<String, Map<String, String>>` in domain → username → password form. Keep both tokens private. The package sends credentials only to the configured server; it does not persist them locally. Both methods throw on validation, network, timeout, and non-success HTTP errors, so callers can catch failures without logging credentials. The timeout defaults to 10 seconds and can be configured with `requestTimeout`. A timeout usually means the device cannot reach the configured server address; check `/health`, the server bind address, and the firewall rather than only increasing the timeout. Close the manager when finished with it:
 
 ```dart
 passwordManager.close();

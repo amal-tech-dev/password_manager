@@ -18,7 +18,7 @@ void main() {
         ingestToken: 'test-token',
         client: client,
       );
-     await manager.save(
+      await manager.save(
         domain: '  school.example ',
         username: ' student ',
         password: ' pass with spaces ',
@@ -104,6 +104,57 @@ void main() {
             'http://vault.example:8765/api/login',
           ),
         ),
+      );
+      manager.close();
+    });
+
+    test('retrieves nested password maps using the dashboard token', () async {
+      late http.Request capturedRequest;
+      final manager = PasswordManager(
+        baseUrl: 'http://vault.example:8765',
+        ingestToken: 'ingest-token',
+        client: MockClient((request) async {
+          capturedRequest = request;
+          return http.Response(
+            jsonEncode({
+              'domain1': {
+                'username1': {'domain': 'domain1', 'password': 'password1'},
+                'username2': {'domain': 'domain1', 'password': 'password2'},
+              },
+              'domain2': {'username3': 'password3'},
+            }),
+            200,
+          );
+        }),
+      );
+
+      final storedData = await manager.getPasswords(dashboardToken: 'dashboard-token');
+
+      expect(capturedRequest.url.path, '/api/vault');
+      expect(
+        capturedRequest.headers['authorization'],
+        'Bearer dashboard-token',
+      );
+      expect(storedData, {
+        'domain1': {
+          'username1': 'password1',
+          'username2': 'password2',
+        },
+        'domain2': {'username3': 'password3'},
+      });
+      manager.close();
+    });
+
+    test('rejects malformed vault response', () async {
+      final manager = PasswordManager(
+        baseUrl: 'http://vault.example:8765',
+        ingestToken: 'ingest-token',
+        client: MockClient((_) async => http.Response('{"domain": []}', 200)),
+      );
+
+      await expectLater(
+        manager.getPasswords(dashboardToken: 'dashboard-token'),
+        throwsFormatException,
       );
       manager.close();
     });

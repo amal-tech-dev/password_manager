@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.2
+
+- Add `getStoredData` to retrieve the vault as a nested
+  `Map<String, Map<String, String>>` of domain, username, and password.
+- Support both current password records and legacy string-valued records when
+  reading stored data.
+- Use the dashboard token for vault reads and report malformed server data.
+
 ## 1.1.1
 
 - Make the server listen on all network interfaces by default for private

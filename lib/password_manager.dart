@@ -79,6 +79,78 @@ class PasswordManager {
     }
   }
 
+  /// Retrieves all saved domain, username, and password records.
+  ///
+  /// The dashboard token is required because the server protects vault reads
+  /// separately from app login writes. Current record objects and legacy
+  /// string-valued records are both converted to the requested nested map.
+  ///
+  /// Throws [ArgumentError] if [dashboardToken] is blank,
+  /// [PasswordManagerException] if the server rejects the request, and
+  /// [FormatException] if the server response is not a vault map.
+  Future<Map<String, Map<String, String>>> getPasswords({
+    required String dashboardToken,
+  }) async {
+    final normalizedToken = dashboardToken.trim();
+    if (normalizedToken.isEmpty) {
+      throw ArgumentError.value(
+        dashboardToken,
+        'dashboardToken',
+        'Must not be blank',
+      );
+    }
+
+    final endpoint = _baseUrl.resolve('/api/vault');
+    late final http.Response response;
+    try {
+      response = await _client
+          .get(
+            endpoint,
+            headers: {'Authorization': 'Bearer $normalizedToken'},
+          )
+          .timeout(_requestTimeout);
+    } on TimeoutException {
+      throw PasswordManagerConnectionException(endpoint);
+    }
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw PasswordManagerException(response.statusCode);
+    }
+    return _parseVault(response.body);
+  }
+
+  static Map<String, Map<String, String>> _parseVault(String body) {
+    final decoded = jsonDecode(body);
+    if (decoded is! Map<String, dynamic>) {
+      throw const FormatException('Vault response must be a JSON object.');
+    }
+
+    final vault = <String, Map<String, String>>{};
+    for (final entry in decoded.entries) {
+      final domain = entry.key;
+      final accounts = entry.value;
+      if (accounts is! Map<String, dynamic>) {
+        throw FormatException('Vault accounts for "$domain" must be an object.');
+      }
+
+      final users = <String, String>{};
+      for (final account in accounts.entries) {
+        final value = account.value;
+        final password = switch (value) {
+          String legacyPassword => legacyPassword,
+          Map<String, dynamic> record when record['password'] is String =>
+            record['password'] as String,
+          _ => throw FormatException(
+              'Vault password for "${account.key}" under "$domain" is invalid.',
+            ),
+        };
+        users[account.key] = password;
+      }
+      vault[domain] = users;
+    }
+    return vault;
+  }
+
   /// Closes the internally created HTTP client, if any.
   ///
   /// A client passed to the constructor remains owned by the caller.
