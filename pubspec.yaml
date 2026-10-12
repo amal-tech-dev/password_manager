@@ -1,0 +1,13 @@
+name: password_manager
+description: A reusable Dart client for a self-hosted encrypted password vault.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  http: ^1.3.0
+
+dev_dependencies:
+  test: ^1.25.8

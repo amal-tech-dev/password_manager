@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+.dart_tool/
+pubspec.lock
+data/
+.env
