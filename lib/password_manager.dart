@@ -31,7 +31,7 @@ class PasswordManager {
   /// Throws [ArgumentError] for blank login fields and
   /// [PasswordManagerException] when the server rejects the request. Network
   /// errors from `package:http` are allowed to propagate to the caller.
-  Future<void> saveSuccessfulLogin({
+  Future<void> save({
     required String domain,
     required String username,
     required String password,
