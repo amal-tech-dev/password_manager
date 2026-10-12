@@ -61,7 +61,7 @@ class PasswordManager {
             'password': password,
           }),
         )
-        .timeout(const Duration(seconds: 5));
+        .timeout(const Duration(seconds: 10));
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw PasswordManagerException(response.statusCode);
