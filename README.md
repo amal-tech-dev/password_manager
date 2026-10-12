@@ -79,7 +79,7 @@ final passwordManager = PasswordManager(
   ingestToken: 'YOUR_INGEST_TOKEN',
 );
 
-await passwordManager.saveSuccessfulLogin(
+await passwordManager.save(
   domain: domain,
   username: username,
   password: password,
