@@ -1,0 +1,39 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  id-token: write
+
+jobs:
+  validate-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify Git Tag matches pubspec.yaml version
+        run: |
+          # Extract version from pubspec.yaml
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | tr -d '\r')
+          
+          # Extract tag name from GitHub ref (e.g., refs/tags/1.0.0 -> 1.0.0)
+          TAG_VERSION=${GITHUB_REF#refs/tags/}
+
+          echo "Pubspec Version: $PUBSPEC_VERSION"
+          echo "Git Tag Version: $TAG_VERSION"
+
+          if [ "$PUBSPEC_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Version mismatch! pubspec.yaml ($PUBSPEC_VERSION) does not match Git tag ($TAG_VERSION)."
+            exit 1
+          fi
+
+          echo "Version check passed successfully!"
+
+  publish:
+    needs: validate-version
+    environment: pub-dev
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
