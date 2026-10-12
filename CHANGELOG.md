@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Update the package release to 1.1.0.
+- Keep vault login records focused on domain, username, and password.
+- Improve package setup and usage guidance for Dart and Flutter applications.
+
 ## 1.0.5
 
 - Use domain, username, and password as the account fields.

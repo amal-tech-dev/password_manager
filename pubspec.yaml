@@ -1,6 +1,6 @@
 name: password_manager
 description: A reusable Dart client for a self-hosted encrypted password vault.
-version: 1.0.5
+version: 1.1.0
 
 repository: https://github.com/madman-technology/password_manager.git
 
