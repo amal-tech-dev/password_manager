@@ -9,7 +9,7 @@ Use only with authorized test accounts. Do not use this for production credentia
 New records are grouped by the `domain` passed to `saveSuccessfulLogin`:
 
 ```text
-domain -> username -> password and optional dashboard details
+domain -> username -> password
 ```
 
 The dashboard stores only the domain, username, and password. Existing vault entries with older optional details remain readable; new or updated entries use only these three fields.
