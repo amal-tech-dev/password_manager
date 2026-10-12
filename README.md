@@ -6,7 +6,7 @@ Use only with authorized test accounts. Do not use this for production credentia
 
 ## Vault data
 
-New records are grouped by the `domain` passed to `saveSuccessfulLogin`:
+New records are grouped by the `domain` passed to `PasswordManager.save`:
 
 ```text
 domain -> username -> password
@@ -56,7 +56,7 @@ python server.py
 
 Open `http://127.0.0.1:8765` on the server device, or `http://HOST-DEVICE-IP:8765` from an authorized client device. Enter the dashboard token to unlock the vault. The PC does not need to be the host; any supported device with Python and persistent storage can run the server.
 
-Use a private network such as Tailscale, restrict firewall access to approved devices, and do not expose this HTTP service to the public internet. Use HTTPS for other network setups. Set `DEV_VAULT_DATA_DIR` if the encrypted vault should be stored outside the project directory.
+When connecting from a different device, use the server device's LAN/Tailscale IP in the client URL, not `127.0.0.1`. For an Android emulator use `10.0.2.2` to reach the development host. Confirm `http://SERVER-IP:8765/health` opens from the client device, and allow inbound TCP port 8765 through the host firewall. Use a private network such as Tailscale, restrict firewall access to approved devices, and do not expose this HTTP service to the public internet. Use HTTPS for other network setups. Set `DEV_VAULT_DATA_DIR` if the encrypted vault should be stored outside the project directory.
 For browser-based Dart/Flutter clients hosted on another origin, set `DEV_VAULT_ALLOWED_ORIGINS` to a comma-separated list of allowed origins instead of `*`.
 
 ## Use the Dart package
@@ -79,14 +79,14 @@ final passwordManager = PasswordManager(
   ingestToken: 'YOUR_INGEST_TOKEN',
 );
 
-await passwordManager.saveSuccessfulLogin(
+await passwordManager.save(
   domain: domain,
   username: username,
   password: password,
 );
 ```
 
-The `domain` argument is saved as the vault group key instead of an institution code. The package sends credentials only to the configured server; it does not persist them locally. `saveSuccessfulLogin` throws on validation, network, and non-success HTTP errors, so callers can catch failures without logging credentials. Close the manager when finished with it:
+The `domain` argument is saved as the vault group key instead of an institution code. The package sends credentials only to the configured server; it does not persist them locally. `save` throws on validation, network, timeout, and non-success HTTP errors, so callers can catch failures without logging credentials. The timeout defaults to 10 seconds and can be configured with `requestTimeout`. A timeout usually means the device cannot reach the configured server address; check `/health`, the server bind address, and the firewall rather than only increasing the timeout. Close the manager when finished with it:
 
 ```dart
 passwordManager.close();

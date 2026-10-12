@@ -18,8 +18,7 @@ void main() {
         ingestToken: 'test-token',
         client: client,
       );
-
-      await manager.saveSuccessfulLogin(
+     await manager.save(
         domain: '  school.example ',
         username: ' student ',
         password: ' pass with spaces ',
@@ -46,7 +45,7 @@ void main() {
       );
 
       await expectLater(
-        manager.saveSuccessfulLogin(
+        manager.save(
           domain: 'school.example',
           username: 'student',
           password: 'private-password',
@@ -70,7 +69,7 @@ void main() {
       );
 
       await expectLater(
-        manager.saveSuccessfulLogin(
+        manager.save(
           domain: ' ',
           username: 'student',
           password: 'private-password',
@@ -78,6 +77,34 @@ void main() {
         throwsArgumentError,
       );
       expect(requestCount, 0);
+      manager.close();
+    });
+
+    test('reports timeout with the endpoint to check', () async {
+      final manager = PasswordManager(
+        baseUrl: 'http://vault.example:8765',
+        ingestToken: 'test-token',
+        requestTimeout: const Duration(milliseconds: 1),
+        client: MockClient((_) async {
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+          return http.Response('{}', 200);
+        }),
+      );
+
+      await expectLater(
+        manager.save(
+          domain: 'school.example',
+          username: 'student',
+          password: 'test-password',
+        ),
+        throwsA(
+          isA<PasswordManagerConnectionException>().having(
+            (error) => error.endpoint.toString(),
+            'endpoint',
+            'http://vault.example:8765/api/login',
+          ),
+        ),
+      );
       manager.close();
     });
   });

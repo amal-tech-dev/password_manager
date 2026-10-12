@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -11,14 +12,17 @@ class PasswordManager {
   PasswordManager({
     required String baseUrl,
     required String ingestToken,
+    Duration requestTimeout = const Duration(seconds: 10),
     http.Client? client,
   })  : _baseUrl = _validatedBaseUrl(baseUrl),
         _ingestToken = _validatedIngestToken(ingestToken),
+        _requestTimeout = _validatedTimeout(requestTimeout),
         _client = client ?? http.Client(),
         _ownsClient = client == null;
 
   final Uri _baseUrl;
   final String _ingestToken;
+  final Duration _requestTimeout;
   final http.Client _client;
   final bool _ownsClient;
 
@@ -29,8 +33,9 @@ class PasswordManager {
   /// is sent unchanged; domain and username are trimmed.
   ///
   /// Throws [ArgumentError] for blank login fields and
-  /// [PasswordManagerException] when the server rejects the request. Network
-  /// errors from `package:http` are allowed to propagate to the caller.
+  /// [PasswordManagerException] when the server rejects the request,
+  /// [PasswordManagerConnectionException] when the request times out, and
+  /// package HTTP exceptions for other network errors.
   Future<void> save({
     required String domain,
     required String username,
@@ -48,9 +53,12 @@ class PasswordManager {
       throw ArgumentError.value(password, 'password', 'Must not be blank');
     }
 
-    final response = await _client
+    final endpoint = _baseUrl.resolve('/api/login');
+    late final http.Response response;
+    try {
+      response = await _client
         .post(
-          _baseUrl.resolve('/api/login'),
+          endpoint,
           headers: {
             'Authorization': 'Bearer $_ingestToken',
             'Content-Type': 'application/json',
@@ -61,7 +69,10 @@ class PasswordManager {
             'password': password,
           }),
         )
-        .timeout(const Duration(seconds: 10));
+          .timeout(_requestTimeout);
+    } on TimeoutException {
+      throw PasswordManagerConnectionException(endpoint);
+    }
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw PasswordManagerException(response.statusCode);
@@ -94,6 +105,13 @@ class PasswordManager {
     }
     return value.trim();
   }
+
+  static Duration _validatedTimeout(Duration value) {
+    if (value <= Duration.zero) {
+      throw ArgumentError.value(value, 'requestTimeout', 'Must be positive');
+    }
+    return value;
+  }
 }
 
 /// Indicates that the vault server rejected a password save request.
@@ -104,4 +122,16 @@ class PasswordManagerException implements Exception {
 
   @override
   String toString() => 'Password vault rejected the request (HTTP $statusCode).';
+}
+
+/// Indicates that the vault server did not respond to the login request.
+class PasswordManagerConnectionException implements Exception {
+  const PasswordManagerConnectionException(this.endpoint);
+
+  final Uri endpoint;
+
+  @override
+  String toString() =>
+      'Timed out connecting to $endpoint. Check that the vault server is '
+      'running, reachable from this device, and listening on the expected port.';
 }

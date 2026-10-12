@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1
+
+- Make the server listen on all network interfaces by default for private
+  network clients.
+- Allow the client request timeout to be configured and report timeout
+  failures with the endpoint to check.
+- Document network address and reachability checks for client devices.
+
 ## 1.1.0
 
 - Update the package release to 1.1.0.
