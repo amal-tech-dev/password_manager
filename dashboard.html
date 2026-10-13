@@ -8,12 +8,15 @@
     <style>
         :root {
             color-scheme: dark;
-            --bg: #10111a;
-            --panel: #191b28;
-            --line: #303347;
-            --text: #f3f2fb;
-            --muted: #a5a7bb;
-            --accent: #b18aff
+            --bg: #100d1c;
+            --panel: #1b1729;
+            --panel-raised: #231e34;
+            --line: #39304f;
+            --text: #f7f4ff;
+            --muted: #b5adc9;
+            --accent: #5D3FD3;
+            --accent-light: #9c83ff;
+            --danger: #ff7185
         }
 
         * {
@@ -22,7 +25,11 @@
 
         body {
             margin: 0;
-            background: var(--bg);
+            min-height: 100vh;
+            background:
+                radial-gradient(ellipse at 12% -10%, #5d3fd32b, transparent 38rem),
+                radial-gradient(ellipse at 100% 35%, #9c83ff12, transparent 34rem),
+                var(--bg);
             color: var(--text);
             font: 14px/1.5 system-ui, Segoe UI, sans-serif
         }
@@ -30,6 +37,8 @@
         header {
             padding: 22px clamp(16px, 4vw, 42px);
             border-bottom: 1px solid var(--line);
+            background: #151122cc;
+            backdrop-filter: blur(16px);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -38,7 +47,8 @@
         }
 
         h1 {
-            font-size: 22px;
+            font-size: 24px;
+            letter-spacing: -.03em;
             margin: 0
         }
 
@@ -53,36 +63,62 @@
         }
 
         .panel {
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 14px
+            background: linear-gradient(145deg, #211c31, var(--panel) 65%);
+            border: 1px solid #ffffff12;
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 12px 32px #08061130
         }
 
         input,
         button {
-            background: #11131d;
+            background: #13101f;
             color: var(--text);
             border: 1px solid var(--line);
-            border-radius: 9px;
+            border-radius: 11px;
             padding: 10px 12px;
-            font: inherit
+            font: inherit;
+            transition: border-color .18s ease, box-shadow .18s ease, background .18s ease, transform .18s ease
         }
 
         input {
             width: 100%;
-            min-width: 0
+            min-width: 0;
+            accent-color: var(--accent)
+        }
+
+        input::placeholder {
+            color: #817891
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-light);
+            box-shadow: 0 0 0 3px #5d3fd333
         }
 
         button {
             cursor: pointer;
-            background: #39285a;
-            border-color: #6f50a6
+            background: var(--accent);
+            border-color: #8065eb;
+            font-weight: 650
         }
 
         button:hover {
-            filter: brightness(1.15)
+            filter: brightness(1.12);
+            transform: translateY(-1px)
+        }
+
+        button:focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 2px
+        }
+
+        button:disabled {
+            cursor: wait;
+            opacity: .65;
+            transform: none
         }
 
         .toolbar {
@@ -122,8 +158,9 @@
             width: 40px;
             height: 40px;
             padding: 8px;
-            background: #25283a;
-            border-color: var(--line)
+            background: var(--panel-raised);
+            border-color: #ffffff18;
+            color: #d9d0ff
         }
 
         .icon-button svg {
@@ -136,6 +173,24 @@
             stroke-width: 1.8
         }
 
+        .icon-button .close-icon {
+            display: none
+        }
+
+        .icon-button[aria-expanded="true"] {
+            background: #35285f;
+            border-color: #8065eb;
+            color: #fff
+        }
+
+        .icon-button[aria-expanded="true"] .add-icon {
+            display: none
+        }
+
+        .icon-button[aria-expanded="true"] .close-icon {
+            display: block
+        }
+
         .account-actions {
             display: flex;
             gap: 8px
@@ -144,7 +199,72 @@
         .institution {
             font-size: 16px;
             font-weight: 700;
-            margin: 18px 0 8px
+            margin: 0
+        }
+
+        .domain-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 10px
+        }
+
+        dialog {
+            width: min(620px, calc(100% - 32px));
+            max-width: 620px;
+            padding: 0;
+            color: var(--text);
+            background: var(--panel);
+            border: 1px solid #8065eb88;
+            border-radius: 20px;
+            box-shadow: 0 24px 80px #05030ccc
+        }
+
+        dialog::backdrop {
+            background: #090711b8;
+            backdrop-filter: blur(6px)
+        }
+
+        .dialog-header,
+        .dialog-body {
+            padding: 20px 22px
+        }
+
+        .dialog-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid var(--line)
+        }
+
+        .dialog-header h2 {
+            margin: 0;
+            font-size: 19px
+        }
+
+        .dialog-body .form-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            margin: 0 0 16px
+        }
+
+        .dialog-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .dialog-actions [data-add-status] {
+            flex: 1;
+            min-height: 22px;
+            margin: 0
+        }
+
+        .secondary-button {
+            background: var(--panel-raised);
+            border-color: var(--line)
         }
 
         .account {
@@ -153,7 +273,13 @@
             gap: 10px;
             align-items: center;
             padding: 11px 12px;
-            border-bottom: 1px solid var(--line)
+            border-bottom: 1px solid #ffffff0d;
+            border-radius: 10px;
+            transition: background .18s ease
+        }
+
+        .account:hover {
+            background: #ffffff06
         }
 
         .account:last-child {
@@ -167,7 +293,7 @@
         .password {
             font-family: ui-monospace, monospace;
             overflow-wrap: anywhere;
-            color: #d6c8ff
+            color: #c4b5ff
         }
 
         .small {
@@ -175,8 +301,20 @@
         }
 
         .danger {
-            background: #512532;
-            border-color: #874252
+            background: #48202e;
+            border-color: #79394a;
+            color: #ffc0c9
+        }
+
+        @media(max-width:650px) {
+            .dialog-body .form-grid {
+                grid-template-columns: 1fr
+            }
+
+            .dialog-header,
+            .dialog-body {
+                padding: 16px
+            }
         }
 
         .status {
@@ -193,7 +331,8 @@
         #login {
             position: fixed;
             inset: 0;
-            background: #10111aee;
+            background: #100d1ce8;
+            backdrop-filter: blur(12px);
             display: grid;
             place-items: center;
             padding: 20px;
@@ -201,7 +340,9 @@
         }
 
         #login .panel {
-            width: min(440px, 100%)
+            width: min(440px, 100%);
+            padding: 26px;
+            border-color: #5d3fd366
         }
 
         #login input {
@@ -252,63 +393,122 @@
                 saved in the encrypted vault file on your PC.</div>
             <div id="status" class="status"></div>
         </div>
-        <section class="panel">
-            <h2>Add a password</h2>
-            <p class="muted small">Saving an existing domain and username updates its password.</p>
-            <form id="addForm">
-                <div class="form-grid">
-                    <label>Domain
-                        <input id="addDomain" name="domain" required maxlength="253" autocomplete="url">
-                    </label>
-                    <label>Username
-                        <input id="addUsername" name="username" required maxlength="200" autocomplete="username">
-                    </label>
-                    <label>Password
-                        <input id="addPassword" name="password" type="password" required maxlength="2000" autocomplete="new-password">
-                    </label>
-                </div>
-                <div class="form-actions">
-                    <button id="addButton" type="submit">Save password</button>
-                    <span id="addStatus" class="status" role="status" aria-live="polite"></span>
-                </div>
-            </form>
-        </section>
         <div id="content"></div>
     </main>
+    <dialog id="addDialog" aria-labelledby="addDialogTitle">
+        <div class="dialog-header">
+            <div>
+                <h2 id="addDialogTitle">Add entry</h2>
+                <p class="muted small">Save a username and password for this domain.</p>
+            </div>
+            <button class="icon-button" type="button" data-dialog-close aria-label="Close add entry dialog" title="Close">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+            </button>
+        </div>
+        <form id="domainAddForm" class="dialog-body">
+            <div class="form-grid">
+                <label>Username<input name="username" required maxlength="200" autocomplete="username"></label>
+                <label>Password<input name="password" type="password" required maxlength="2000" autocomplete="new-password"></label>
+            </div>
+            <div class="dialog-actions">
+                <button type="submit">Save password</button>
+                <button class="secondary-button" type="button" data-dialog-close>Cancel</button>
+                <span class="status" data-add-status role="status" aria-live="polite"></span>
+            </div>
+        </form>
+    </dialog>
     <script>
-        let token = '', vault = {};
+        let token = '', vault = {}, savingDomainForm = false, activeDomain = '';
         const $ = id => document.getElementById(id);
         function esc(s) {return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]))}
         async function request(url, options = {}) {const r = await fetch(url, {...options, headers: {...(options.headers || {}), 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}}); if (!r.ok) throw Error((await r.text()).slice(0, 250)); return r.status === 204 ? null : r.json()}
         async function load() {vault = await request('/api/vault'); render(); $('status').textContent = 'Vault unlocked · ' + Object.values(vault).reduce((n, u) => n + Object.keys(u).length, 0) + ' account(s)'}
         async function addPassword(event) {
             event.preventDefault();
-            const button = $('addButton');
-            const status = $('addStatus');
+            await saveDomainForm(event.currentTarget, true);
+        }
+        async function saveDomainForm(form, closeOnSuccess = false) {
+            if (savingDomainForm) return false;
+            const button = form.querySelector('button[type="submit"]');
+            const status = form.querySelector('[data-add-status]');
+            savingDomainForm = true;
             button.disabled = true;
             status.textContent = 'Saving…';
             try {
                 const result = await request('/api/vault', {
                     method: 'POST',
                     body: JSON.stringify({
-                        domain: $('addDomain').value,
-                        username: $('addUsername').value,
-                        password: $('addPassword').value
+                        domain: form.dataset.domain,
+                        username: form.elements.username.value,
+                        password: form.elements.password.value
                     })
                 });
-                $('addForm').reset();
-                status.textContent = result.result === 'created' ? 'Password added.' :
+                form.reset();
+                const message = result.result === 'created' ? 'Password added.' :
                     result.result === 'updated' ? 'Password updated.' : 'Password is unchanged.';
+                status.textContent = message;
+                if (closeOnSuccess) $('addDialog').close();
                 try {
                     await load();
+                    $('status').textContent = message;
                 } catch (e) {
-                    status.textContent += ' The vault could not be refreshed: ' + e.message;
+                    const refreshError = message + ' The vault could not be refreshed: ' + e.message;
+                    status.textContent = refreshError;
+                    $('status').textContent = refreshError;
                 }
+                return true;
             } catch (e) {
                 status.textContent = 'Could not save password: ' + e.message;
+                return false;
             } finally {
                 button.disabled = false;
+                savingDomainForm = false;
             }
+        }
+        function openDomainForm(domain) {
+            if (activeDomain !== domain) {
+                $('domainAddForm').querySelector('[data-add-status]').textContent = '';
+            }
+            activeDomain = domain;
+            $('domainAddForm').dataset.domain = domain;
+            $('addDialogTitle').textContent = 'Add entry to ' + domain;
+            $('content').querySelectorAll('[data-add-toggle]').forEach(button => {
+                const isTarget = button.dataset.domain === domain;
+                button.setAttribute('aria-expanded', String(isTarget));
+                button.setAttribute('aria-label', isTarget
+                    ? 'Close add entry for ' + domain
+                    : 'Add entry for ' + button.dataset.domain);
+                button.title = isTarget ? 'Close form' : 'Add entry';
+            });
+            if (!$('addDialog').open) $('addDialog').showModal();
+            $('domainAddForm').elements.username.focus();
+        }
+        async function toggleDomainForm(button) {
+            if (savingDomainForm) return;
+            const targetDomain = button.dataset.domain;
+            const form = $('domainAddForm');
+            const dialog = $('addDialog');
+            if (dialog.open && activeDomain === targetDomain) {
+                dialog.close();
+                return;
+            }
+
+            if (form.dataset.domain && form.dataset.domain !== targetDomain) {
+                const hasDraft = form.elements.username.value !== '' ||
+                    form.elements.password.value !== '';
+                if (hasDraft) {
+                    const shouldSave = confirm(
+                        'Save the entry for ' + form.dataset.domain +
+                        ' before opening ' + targetDomain +
+                        '? Choose Cancel to keep editing the current entry.'
+                    );
+                    if (!shouldSave || !await saveDomainForm(form)) {
+                        if (!dialog.open) openDomainForm(form.dataset.domain);
+                        return;
+                    }
+                }
+            }
+            openDomainForm(targetDomain);
         }
         function render() {
             const q = $('search').value.toLowerCase();
@@ -319,7 +519,7 @@
                 const rows = Object.keys(users).sort().filter(username =>
                     (domain + ' ' + username).toLowerCase().includes(q));
                 if (!rows.length) continue;
-                html += `<section class="panel"><div class="institution">${esc(domain)}</div>`;
+                html += `<section class="panel"><div class="domain-heading"><div class="institution">${esc(domain)}</div><button class="icon-button" type="button" data-add-toggle data-domain="${esc(domain)}" aria-expanded="false" aria-label="Add entry for ${esc(domain)}" title="Add entry"><svg class="add-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m-7-7h14"></path></svg><svg class="close-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg></button></div>`;
                 for (const username of rows) {
                     const id = 'pw' + ++total;
                     const value = users[username];
@@ -331,7 +531,9 @@
                 html += '</section>';
             }
             $('content').innerHTML = html ||
-                '<div class="panel empty">No matching accounts. Add one here or save one from a developer app.</div>';
+                '<div class="panel empty">No matching accounts.</div>';
+            $('content').querySelectorAll('[data-add-toggle]').forEach(button =>
+                button.onclick = () => toggleDomainForm(button));
             $('content').querySelectorAll('[data-reveal]').forEach(button => button.onclick = () => {
                 const element = $(button.dataset.reveal);
                 const shown = button.getAttribute('aria-label') === 'Hide password';
@@ -353,8 +555,20 @@
                 });
         }
         async function unlock() {token = $('token').value.trim(); if (!token) return; $('loginError').textContent = ''; try {await load(); $('login').style.display = 'none'} catch (e) {token = ''; $('loginError').textContent = 'Could not unlock vault. Check token and server.'} }
-        function lock() {token = ''; vault = {}; $('token').value = ''; $('addForm').reset(); $('addStatus').textContent = ''; $('login').style.display = 'grid'; $('content').innerHTML = ''; $('status').textContent = 'Locked'}
-        $('connect').onclick = unlock; $('token').addEventListener('keydown', e => {if (e.key === 'Enter') unlock()}); $('reload').onclick = () => load().catch(e => alert(e.message)); $('search').oninput = render; $('lock').onclick = lock; $('addForm').addEventListener('submit', addPassword);
+        $('addDialog').addEventListener('close', () => {
+            if ($('addDialog').open) return;
+            activeDomain = '';
+            $('content').querySelectorAll('[data-add-toggle]').forEach(button => {
+                button.setAttribute('aria-expanded', 'false');
+                button.setAttribute('aria-label', 'Add entry for ' + button.dataset.domain);
+                button.title = 'Add entry';
+            });
+        });
+        $('addDialog').querySelectorAll('[data-dialog-close]').forEach(button =>
+            button.onclick = () => $('addDialog').close());
+        $('domainAddForm').addEventListener('submit', addPassword);
+        function lock() {token = ''; vault = {}; $('token').value = ''; $('login').style.display = 'grid'; $('content').innerHTML = ''; $('status').textContent = 'Locked'}
+        $('connect').onclick = unlock; $('token').addEventListener('keydown', e => {if (e.key === 'Enter') unlock()}); $('reload').onclick = () => load().catch(e => alert(e.message)); $('search').oninput = render; $('lock').onclick = lock;
     </script>
 </body>
 

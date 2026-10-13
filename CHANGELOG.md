@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.3
+
+- Replace the shared dashboard add-password section with domain-specific
+  controls and a modal entry form.
+- Prompt to save a non-empty draft before switching domains, and preserve
+  drafts when saving fails or the dialog is closed.
+- Improve dashboard save feedback, accessibility, and visual styling.
+
 ## 1.1.2
 
 - Add `getStoredData` to retrieve the vault as a nested
