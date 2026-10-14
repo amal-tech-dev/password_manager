@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Password Manager Vault",
+  "description": "User-controlled access to your self-hosted password vault.",
+  "version": "1.0.0",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "action": {
+    "default_title": "Password Manager Vault",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html"
+}

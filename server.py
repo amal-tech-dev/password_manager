@@ -12,11 +12,13 @@ from pydantic import BaseModel, Field
 import uvicorn
 
 ROOT = Path(__file__).resolve().parent
+WEB_DIR = ROOT / "web"
 DATA_DIR = Path(os.getenv("DEV_VAULT_DATA_DIR", str(ROOT / "data")))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 VAULT_FILE = DATA_DIR / "vault.enc"
 INGEST_TOKEN = os.getenv("DEV_VAULT_INGEST_TOKEN", "")
 DASHBOARD_TOKEN = os.getenv("DEV_VAULT_DASHBOARD_TOKEN", "")
+EXTENSION_TOKEN = os.getenv("DEV_VAULT_EXTENSION_TOKEN", "")
 VAULT_KEY = os.getenv("DEV_VAULT_FERNET_KEY", "")
 HOST = os.getenv("DEV_VAULT_HOST", "0.0.0.0")
 PORT = int(os.getenv("DEV_VAULT_PORT", "8765"))
@@ -37,7 +39,7 @@ app = FastAPI(title="Password Manager", docs_url=None, redoc_url=None)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_methods=["POST"],
+    allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
 )
 vault_lock = threading.RLock()
@@ -98,7 +100,7 @@ def store_login(record: LoginRecord) -> str:
 
 @app.get("/")
 async def dashboard():
-    return FileResponse(ROOT / "dashboard.html")
+    return FileResponse(WEB_DIR / "dashboard.html")
 
 @app.get("/health")
 async def health():
@@ -122,6 +124,50 @@ async def get_vault(authorization: str | None = Header(default=None)):
 async def save_dashboard_login(record: LoginRecord, authorization: str | None = Header(default=None)):
     if not authorized(authorization, DASHBOARD_TOKEN):
         raise HTTPException(status_code=401, detail="Invalid dashboard credentials")
+    return {"ok": True, "result": store_login(record)}
+
+def authorize_extension(header: str | None) -> None:
+    if len(EXTENSION_TOKEN) < 32:
+        raise HTTPException(status_code=503, detail="Browser extension access is not configured")
+    if not authorized(header, EXTENSION_TOKEN):
+        raise HTTPException(status_code=401, detail="Invalid browser extension credentials")
+
+@app.get("/api/extension/matches")
+async def get_extension_matches(
+    domain: str,
+    authorization: str | None = Header(default=None),
+):
+    authorize_extension(authorization)
+    normalized_domain = domain.strip().lower()
+    if not normalized_domain or len(normalized_domain) > 253:
+        raise HTTPException(status_code=422, detail="A valid domain is required")
+
+    with vault_lock:
+        vault = read_vault()
+        users = next(
+            (
+                accounts
+                for stored_domain, accounts in vault.items()
+                if stored_domain.strip().lower() == normalized_domain
+            ),
+            {},
+        )
+
+    accounts = []
+    for username, value in users.items():
+        password = value if isinstance(value, str) else (
+            value.get("password") if isinstance(value, dict) else None
+        )
+        if isinstance(password, str):
+            accounts.append({"username": username, "password": password})
+    return {"domain": normalized_domain, "accounts": accounts}
+
+@app.post("/api/extension/login")
+async def save_extension_login(
+    record: LoginRecord,
+    authorization: str | None = Header(default=None),
+):
+    authorize_extension(authorization)
     return {"ok": True, "result": store_login(record)}
 
 @app.delete("/api/vault/{domain}/{username}")

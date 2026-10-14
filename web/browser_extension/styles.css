@@ -1,0 +1,220 @@
+:root {
+  color-scheme: dark;
+  --bg: #100d1c;
+  --panel: #1b1729;
+  --raised: #252038;
+  --line: #39304f;
+  --text: #f7f4ff;
+  --muted: #b5adc9;
+  --accent: #5d3fd3;
+  --accent-light: #9c83ff;
+  font: 14px/1.5 system-ui, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 8% 0, #5d3fd333, transparent 24rem),
+    var(--bg);
+}
+
+.popup-page {
+  width: 370px;
+  min-height: 300px;
+}
+
+.popup-page main {
+  padding: 16px;
+}
+
+.options-page {
+  min-height: 100vh;
+  padding: 32px 16px;
+}
+
+.options-page main {
+  width: min(560px, 100%);
+  margin: 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+}
+
+.brand-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: white;
+  background: linear-gradient(145deg, #8c6cff, var(--accent));
+  border-radius: 14px;
+  box-shadow: 0 8px 22px #5d3fd344;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  font-size: 19px;
+  letter-spacing: -.02em;
+}
+
+.brand p,
+.muted,
+.hint,
+.footnote {
+  color: var(--muted);
+}
+
+.brand p {
+  margin: 2px 0 0;
+  font-size: 12px;
+}
+
+.card {
+  padding: 18px;
+  background: linear-gradient(145deg, #211c31, var(--panel) 65%);
+  border: 1px solid #ffffff14;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px #08061138;
+}
+
+.options-page .card {
+  padding: 26px;
+}
+
+.eyebrow {
+  color: var(--accent-light);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .12em;
+}
+
+.options-page h1 {
+  margin: 4px 0;
+  font-size: 25px;
+}
+
+label {
+  display: block;
+  margin: 12px 0 6px;
+  font-weight: 650;
+}
+
+input,
+button {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+  color: var(--text);
+  background: #13101f;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+}
+
+input:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent-light);
+  outline-offset: 2px;
+}
+
+input:focus {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 3px #5d3fd333;
+}
+
+button {
+  margin-top: 12px;
+  background: var(--accent);
+  border-color: #8065eb;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:hover {
+  filter: brightness(1.12);
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+button.secondary,
+button.text-button,
+button.account-button {
+  background: var(--raised);
+  border-color: var(--line);
+}
+
+button.text-button {
+  min-height: 32px;
+  padding: 4px 8px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  font-weight: 500;
+}
+
+.site-label {
+  margin-bottom: 2px;
+  color: var(--accent-light);
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.status {
+  min-height: 20px;
+  margin: 10px 0 4px;
+  color: #d6cbff;
+  overflow-wrap: anywhere;
+}
+
+.hint,
+.footnote {
+  font-size: 12px;
+}
+
+.hint {
+  margin: 5px 0 12px;
+}
+
+.footnote {
+  margin: 12px 4px 0;
+}
+
+.divider {
+  height: 1px;
+  margin: 16px 0 4px;
+  background: var(--line);
+}
+
+.saved-logins {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.saved-logins button {
+  margin: 0;
+  text-align: left;
+}
+
+.options-page .status {
+  margin-top: 14px;
+}

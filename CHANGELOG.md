@@ -7,6 +7,8 @@
 - Prompt to save a non-empty draft before switching domains, and preserve
   drafts when saving fails or the dialog is closed.
 - Improve dashboard save feedback, accessibility, and visual styling.
+- Add a Chrome and Edge extension for confirmed, user-initiated saving and
+  filling through a separate extension token.
 
 ## 1.1.2
 

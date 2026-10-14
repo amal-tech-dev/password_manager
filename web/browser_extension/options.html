@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Password Manager Vault Settings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="options-page">
+  <main class="card">
+    <header>
+      <span class="eyebrow">PRIVATE VAULT</span>
+      <h1>Connection settings</h1>
+      <p class="muted">Connect this extension to your self-hosted vault.</p>
+    </header>
+    <form id="settingsForm">
+      <label for="serverUrl">Vault server URL</label>
+      <input id="serverUrl" name="serverUrl" type="url" placeholder="https://your-vault.example" required>
+      <p class="hint">HTTPS is required. HTTP is allowed only for localhost during local development.</p>
+
+      <label for="extensionToken">Extension access token</label>
+      <input id="extensionToken" name="extensionToken" type="password" minlength="32" autocomplete="off" required>
+      <p class="hint">Use a separate token generated for the extension. Never use the dashboard or ingest token here.</p>
+
+      <label for="passphrase">Encryption passphrase</label>
+      <input id="passphrase" name="passphrase" type="password" minlength="12" autocomplete="new-password" required>
+      <label for="passphraseConfirm">Confirm passphrase</label>
+      <input id="passphraseConfirm" name="passphraseConfirm" type="password" minlength="12" autocomplete="new-password" required>
+      <p class="hint">The token is encrypted in extension storage. You must unlock the extension with this passphrase each time; it cannot be recovered if forgotten.</p>
+
+      <button type="submit">Save secure settings</button>
+      <button id="forgetSettings" class="secondary" type="button">Forget saved settings</button>
+      <p id="settingsStatus" class="status" role="status" aria-live="polite"></p>
+    </form>
+  </main>
+  <script src="crypto.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

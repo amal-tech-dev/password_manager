@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Password Manager Vault</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="popup-page">
+  <main>
+    <header class="brand">
+      <span class="brand-mark" aria-hidden="true">◆</span>
+      <div>
+        <h1>Password Vault</h1>
+        <p class="muted">Your self-hosted vault</p>
+      </div>
+    </header>
+
+    <section id="unlockPanel" class="card">
+      <p id="setupHint" class="muted" hidden>Set up your vault connection before unlocking.</p>
+      <form id="unlockForm">
+        <label for="unlockPassphrase">Encryption passphrase</label>
+        <input id="unlockPassphrase" type="password" autocomplete="current-password" required>
+        <button type="submit">Unlock for this session</button>
+      </form>
+      <p id="unlockStatus" class="status" role="status" aria-live="polite"></p>
+      <button id="openSettings" class="text-button" type="button">Connection settings</button>
+    </section>
+
+    <section id="vaultPanel" class="card" hidden>
+      <p id="siteLabel" class="site-label">No page selected</p>
+      <button id="scanPage" type="button">Check this page for a login</button>
+      <p id="scanStatus" class="status" role="status" aria-live="polite"></p>
+
+      <form id="saveForm" hidden>
+        <label for="siteUsername">Username</label>
+        <input id="siteUsername" name="username" maxlength="200" autocomplete="off">
+        <label for="sitePassword">Password</label>
+        <input id="sitePassword" name="password" type="password" maxlength="2000" autocomplete="new-password">
+        <button id="saveLogin" type="submit">Ask to save login</button>
+      </form>
+
+      <div class="divider"></div>
+      <button id="findLogins" class="secondary" type="button">Find saved logins</button>
+      <div id="savedLogins" class="saved-logins"></div>
+      <p id="vaultStatus" class="status" role="status" aria-live="polite"></p>
+      <button id="lockSession" class="text-button" type="button">Lock this session</button>
+    </section>
+    <p class="footnote">Scanning and filling happen only after you click. Passwords are not saved in this browser.</p>
+  </main>
+  <script src="crypto.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
